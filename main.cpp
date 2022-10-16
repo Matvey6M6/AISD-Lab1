@@ -4,15 +4,15 @@ using namespace std;
 
 ostream &operator<<(ostream &os, const Mnogochlen &Obj)
 {
-    if (Obj.GetOrderOfPolynominal() == -1)
+    if (Obj.GetOrderOfMnogochlen() == -1)
     {
         cout << "Polynominal has no coefs" << endl;
     }
     Node *Pointer = Obj.GetHead();
-    for (int i = 0; i < Obj.GetOrderOfPolynominal() + 1; i++)
+    for (int i = 0; i < Obj.GetOrderOfMnogochlen() + 1; i++)
     {
         os << Pointer->Value << "*x^" << Pointer->MyOrder;
-        if (i != Obj.GetOrderOfPolynominal())
+        if (i != Obj.GetOrderOfMnogochlen())
             os << " + ";
         Pointer = Pointer->Next;
     }
