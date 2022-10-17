@@ -105,3 +105,94 @@ void Mnogochlen::Set(int Order, double Coef)
         PointerA = PointerA->Next;
     }
 }
+
+double Mnogochlen::operator[](int Order)
+{
+    if (Order < 0 || Order > OrderOfMnogochlen)
+    {
+        throw RangeError("Incorrect \"Order\", value can't be found\n");
+    }
+
+    Node *Pointer = GetHead();
+
+    for (int i = 0; i <= GetOrderOfMnogochlen(); i++)
+    {
+        if (Pointer->MyOrder == Order)
+            return Pointer->Value;
+        Pointer = Pointer->Next;
+    }
+    throw RangeError("Order has no coef\n");
+}
+
+Mnogochlen Mnogochlen::operator+(const Mnogochlen &other)
+{
+    int Length = 0;
+    int Maximum = 0;
+    this->GetOrderOfMnogochlen() > other.GetOrderOfMnogochlen() ? Length = other.GetOrderOfMnogochlen() : Length = this->GetOrderOfMnogochlen();
+
+    this->GetOrderOfMnogochlen() < other.GetOrderOfMnogochlen() ? Maximum = other.GetOrderOfMnogochlen() : Maximum = this->GetOrderOfMnogochlen();
+
+    Mnogochlen Result(Length);
+
+    Node *PointerA = this->GetHead();
+    Node *PointerB = other.GetHead();
+
+    for (int i = 0; i < Length + 1; i++)
+    {
+        for (int j = 0; j <= Maximum + 1; j++)
+        {
+            if (PointerA->MyOrder == PointerB->MyOrder)
+            {
+                Result.Set(PointerA->MyOrder, (PointerA->Value + PointerB->Value));
+                break;
+            }
+            PointerB = PointerB->Next;
+        }
+        PointerB = other.GetHead();
+        PointerA = PointerA->Next;
+    }
+    return Result;
+}
+
+Mnogochlen Mnogochlen::operator-(const Mnogochlen &other)
+{
+    int Length = 0;
+    int Maximum = 0;
+    this->GetOrderOfMnogochlen() > other.GetOrderOfMnogochlen() ? Length = other.GetOrderOfMnogochlen() : Length = this->GetOrderOfMnogochlen();
+
+    this->GetOrderOfMnogochlen() < other.GetOrderOfMnogochlen() ? Maximum = other.GetOrderOfMnogochlen() : Maximum = this->GetOrderOfMnogochlen();
+
+    Mnogochlen Result(Length);
+
+    Node *PointerA = this->GetHead();
+    Node *PointerB = other.GetHead();
+
+    for (int i = 0; i < Length + 1; i++)
+    {
+        for (int j = 0; j <= Maximum + 1; j++)
+        {
+            if (PointerA->MyOrder == PointerB->MyOrder)
+            {
+                Result.Set(PointerA->MyOrder, (PointerA->Value - PointerB->Value));
+                break;
+            }
+            PointerB = PointerB->Next;
+        }
+        PointerB = other.GetHead();
+        PointerA = PointerA->Next;
+    }
+    return Result;
+}
+
+Mnogochlen Mnogochlen::operator*(double Val)
+{
+    Node *Pointer = GetHead();
+    Mnogochlen Result(Pointer->MyOrder);
+
+    for (int i = 0; i <= GetOrderOfMnogochlen(); i++)
+    {
+        Result.Set(Pointer->MyOrder, Pointer->Value * Val);
+        Pointer = Pointer->Next;
+    }
+    return Result;
+}

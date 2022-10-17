@@ -31,6 +31,14 @@ public:
 
     void Set(int Order, double Coef);
 
+    double operator[](int Order);
+
+    Mnogochlen operator+(const Mnogochlen &other);
+
+    Mnogochlen operator-(const Mnogochlen &other);
+
+    Mnogochlen operator*(double Val);
+
     double CountValue(double x);
 
     friend ostream &operator<<(ostream &os, const Mnogochlen &Obj);
