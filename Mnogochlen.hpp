@@ -41,5 +41,7 @@ public:
 
     double CountValue(double x);
 
+    int GetRoots(double *x);
+
     friend ostream &operator<<(ostream &os, const Mnogochlen &Obj);
 };

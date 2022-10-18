@@ -106,6 +106,69 @@ void Mnogochlen::Set(int Order, double Coef)
     }
 }
 
+int Mnogochlen::GetRoots(double *x)
+{
+    if (GetOrderOfMnogochlen() != 3)
+    {
+        throw RangeError("Order is not 3");
+    }
+    Node *Pointer = GetHead();
+    if (Pointer->Value != 1)
+        Normalize();
+
+    double a = 0;
+    double b = 0;
+    double c = 0;
+
+    for (int i = 0; i < GetOrderOfMnogochlen() + 1; i++)
+    {
+        if (Pointer->MyOrder == 2)
+            a = Pointer->Value;
+        if (Pointer->MyOrder == 1)
+            b = Pointer->Value;
+        if (Pointer->MyOrder == 0)
+            c = Pointer->Value;
+
+        Pointer = Pointer->Next;
+    }
+
+    double q, r, r2, q3;
+    q = (a * a - 3. * b) / 9.;
+    r = (a * (2. * a * a - 9. * b) + 27. * c) / 54.;
+    r2 = r * r;
+    q3 = q * q * q;
+    if (r2 < q3)
+    {
+        double t = acos(r / sqrt(q3));
+        a /= 3.;
+        q = -2. * sqrt(q);
+        x[0] = q * cos(t / 3.) - a;
+        x[1] = q * cos((t + M_2PI) / 3.) - a;
+        x[2] = q * cos((t - M_2PI) / 3.) - a;
+        return (3);
+    }
+    else
+    {
+        double aa, bb;
+        if (r <= 0.)
+            r = -r;
+        aa = -pow(r + sqrt(r2 - q3), 1. / 3.);
+        if (aa != 0.)
+            bb = q / aa;
+        else
+            bb = 0.;
+        a /= 3.;
+        q = aa + bb;
+        r = aa - bb;
+        x[0] = q - a;
+        x[1] = (-0.5) * q - a;
+        x[2] = (sqrt(3.) * 0.5) * fabs(r);
+        if (x[2] == 0.)
+            return (2);
+        return (1);
+    }
+}
+
 double Mnogochlen::operator[](int Order)
 {
     if (Order < 0 || Order > OrderOfMnogochlen)
