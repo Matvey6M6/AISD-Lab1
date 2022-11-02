@@ -1,5 +1,19 @@
 #include "Mnogochlen.hpp"
 
+Mnogochlen Mnogochlen::Normalize() const
+{
+    Mnogochlen *Newbie = new Mnogochlen(GetOrderOfMnogochlen());
+
+    double Delitel = (*this)[GetOrderOfMnogochlen()];
+
+    for (int i = OrderOfMnogochlen; i >= 0; i--)
+    {
+        Newbie->Set(i, ((*this)[i] / Delitel));
+    }
+
+    return *Newbie;
+}
+
 Node *Mnogochlen::GetHead() const
 {
     return Head;
@@ -115,7 +129,7 @@ Mnogochlen Mnogochlen::operator+(const Mnogochlen &Other) const
 
     Mnogochlen Result(Maximum);
 
-    int CurrentOrder = Maximum;
+    long long CurrentOrder = Maximum;
 
     while (CurrentOrder > -1)
     {
@@ -128,7 +142,7 @@ Mnogochlen Mnogochlen::operator+(const Mnogochlen &Other) const
 
 Mnogochlen Mnogochlen::operator-(const Mnogochlen &Other) const
 {
-    int Maximum = 0;
+    long long Maximum = 0;
 
     this->GetOrderOfMnogochlen() < Other.GetOrderOfMnogochlen() ? Maximum = Other.GetOrderOfMnogochlen() : Maximum = this->GetOrderOfMnogochlen();
 
@@ -158,107 +172,24 @@ Mnogochlen Mnogochlen::operator*(double Val) const
     return Result;
 }
 
-double Mnogochlen::CountValue(double x) const
-{
-    Node *Pointer = GetHead();
-    double Ans = 0;
-    for (long long i = 0; i < GetOrderOfMnogochlen() + 1 && Pointer; i++)
-    {
-        Ans += Pointer->Value * pow(x, Pointer->MyOrder);
-        Pointer = Pointer->Next;
-    }
-    return Ans;
-}
-/*
 void Mnogochlen::GetRoots() const
-{
-    Mnogochlen *Newbie = &Normalize();
-    double a = (*Newbie)[3];
-    double b = (*Newbie)[2];
-    double c = (*Newbie)[1];
-    double d = (*Newbie)[0];
-
-    long double p = ((3. * a * c - b * b) / (3. * a * a));
-    long double q = ((2. * b * b - 9. * a * b * c + 27. * a * a * d));
-    long double s = (((q * q) / 4.) + (p * p * p) / 27.);
-
-    long double x1, x2, x3, x2i, x3i;
-
-    long double f;
-
-    if (q < 0)
-    {
-        f = (atan(pow(-s, 0.5) / (-q / 2)));
-    }
-    else if (q > 0)
-    {
-        f = (atan(pow(-s, 0.5) / (-q / 2)) + M_PI);
-    }
-    else
-    {
-        f = (M_PI / 2);
-    }
-
-    if (s < 0)
-    {
-        x1 = (2. * pow((-p / 3.), 0.5) * cos(f / 3.) - b / 3. * a);
-        x2 = (2. * pow((-p / 3.), 0.5) * cos(f / 3. + (2. * M_PI) / 3.) - b / 3. * a);
-        x3 = (2. * pow((-p / 3.), 0.5) * cos(f / 3. + (2. * M_PI) / 3.) - b / 3. * a);
-    }
-    else if (s > 0)
-    {
-        x1 = (pow(-q / 2. + pow(s, 0.5), 1. / 3.) + pow(-q / 2. - (pow(s, 0.5)), 1. / 3.) - b / (3. * a));
-        x2 = (-0.5 * (pow(-q / 2. + pow(s, 0.5), 1. / 3.) + pow(-q / 2. - (pow(s, 0.5)), 1. / 3.) - b / (3. * a)));
-        x2i = ((pow(3., 0.5) / 2.) * (pow(-q / 2. + (pow(s, 0.5)), 1. / 3.) - pow(-q / 2. - (pow(s, 0.5)), 1. / 3.)));
-        x3 = (-0.5 * (pow(-q / 2 + pow(s, 0.5), 1 / 3) + pow(-q / 2 - (pow(s, 0.5)), 1 / 3) - b / (3 * a)));
-        x3i = ((pow(3., 0.5) / 2.) * (pow(-q / 2. + (pow(s, 0.5)), 1. / 3.) - pow(-q / 2. - (pow(s, 0.5)), 1. / 3.)));
-    }
-    else
-    {
-        x1 = (2. * pow(-q / 2., 1. / 3.) - b / (3. * a));
-        x2 = (-1. * pow(-q / 2., 1. / 3.) - b / (3. * a));
-        x3 = (-1. * pow(-q / 2., 1. / 3.) - b / (3. * a));
-    }
-
-    cout << "x1= " << x1 << endl;
-
-    if (s > 0)
-    {
-        cout << "x2= " << x2 << "+" << x2i << "i" << endl;
-        cout << "x3= " << x3 << "-" << x3i << "i" << endl;
-    }
-    else
-    {
-        cout << "x2= " << x2 << endl;
-        cout << "x3= " << x3 << endl;
-    }
-}*/
-
-/*int Mnogochlen::GetRoots(double *x) const
 {
     if (GetOrderOfMnogochlen() != 3)
     {
         throw RangeError("Order is not 3");
     }
     Node *Pointer = GetHead();
-    if (Pointer->Value != 1)
-        Normalize();
+    Mnogochlen Normalized = Normalize();
 
-    double a = 0;
-    double b = 0;
-    double c = 0;
+    // cout << Normalized << endl;
 
-    for (int i = 0; i < GetOrderOfMnogochlen() + 1; i++)
-    {
-        if (Pointer->MyOrder == 2)
-            a = Pointer->Value;
-        if (Pointer->MyOrder == 1)
-            b = Pointer->Value;
-        if (Pointer->MyOrder == 0)
-            c = Pointer->Value;
+    double a = Normalized[2];
+    double b = Normalized[1];
+    double c = Normalized[0];
 
-        Pointer = Pointer->Next;
-    }
+    double x1;
+    double x2;
+    double x3;
 
     double q, r, r2, q3;
     q = (a * a - 3. * b) / 9.;
@@ -270,10 +201,12 @@ void Mnogochlen::GetRoots() const
         double t = acos(r / sqrt(q3));
         a /= 3.;
         q = -2. * sqrt(q);
-        x[0] = q * cos(t / 3.) - a;
-        x[1] = q * cos((t + M_2M_M_M_PI) / 3.) - a;
-        x[2] = q * cos((t - M_2M_M_M_PI) / 3.) - a;
-        return (3);
+        x1 = q * cos(t / 3.) - a;
+        x2 = q * cos((t + M_2PI) / 3.) - a;
+        x3 = q * cos((t - M_2PI) / 3.) - a;
+        cout << "Root 1 = " << x1 << endl;
+        cout << "Root 2 = " << x2 << endl;
+        cout << "Root 3 = " << x3 << endl;
     }
     else
     {
@@ -288,11 +221,26 @@ void Mnogochlen::GetRoots() const
         a /= 3.;
         q = aa + bb;
         r = aa - bb;
-        x[0] = q - a;
-        x[1] = (-0.5) * q - a;
-        x[2] = (sqrt(3.) * 0.5) * fabs(r);
-        if (x[2] == 0.)
-            return (2);
-        return (1);
+        x1 = q - a;
+        x2 = (-0.5) * q - a;
+        x3 = (sqrt(3.) * 0.5) * fabs(r);
+        if (x3 == 0.)
+        {
+            cout << "Root 1 = " << x1 << endl;
+            cout << "Root 2 = " << x2 << endl;
+        }
+        cout << "Root 1 = " << x1 << endl;
     }
-}*/
+}
+
+double Mnogochlen::CountValue(double x) const
+{
+    Node *Pointer = GetHead();
+    double Ans = 0;
+    for (long long i = 0; i < GetOrderOfMnogochlen() + 1 && Pointer; i++)
+    {
+        Ans += Pointer->Value * pow(x, Pointer->MyOrder);
+        Pointer = Pointer->Next;
+    }
+    return Ans;
+}
