@@ -1,87 +1,273 @@
-#include "Mnogochlen.hpp"
 #include <iostream>
+#include <conio.h>
+#include "Mnogochlen.hpp"
 using namespace std;
+
+/*char getch(void)
+{
+    char buf = 0;
+    struct termios old = {0};
+    fflush(stdout);
+    if (tcgetattr(0, &old) < 0)
+        perror("tcsetattr()");
+    old.c_lflag &= ~ICANON;
+    old.c_lflag &= ~ECHO;
+    old.c_cc[VMIN] = 1;
+    old.c_cc[VTIME] = 0;
+    if (tcsetattr(0, TCSANOW, &old) < 0)
+        perror("tcsetattr ICANON");
+    if (read(0, &buf, 1) < 0)
+        perror("read()");
+    old.c_lflag |= ICANON;
+    old.c_lflag |= ECHO;
+    if (tcsetattr(0, TCSADRAIN, &old) < 0)
+        perror("tcsetattr ~ICANON");
+    return buf;
+}*/
+
+Mnogochlen *MenuInput()
+{
+    cout << "Create poilynominal menu\n\n"
+         << endl;
+
+    cout << "Order of Mnogochlen: " << endl;
+    long long OrderOfMnogochlen = 0;
+    cin >> OrderOfMnogochlen;
+
+    Mnogochlen *Newbie = NULL;
+    try
+    {
+        Newbie = new Mnogochlen(OrderOfMnogochlen);
+    }
+    catch (exception e)
+    {
+        clog << "An exception occured" << endl;
+    }
+
+    for (long long i = OrderOfMnogochlen; i >= 0; i--)
+    {
+        cout << "Coef by " << i << ":\n";
+        double Coefficient = 0;
+        cin >> Coefficient;
+        Newbie->Set(i, Coefficient);
+        cout << endl;
+    }
+
+    cout << "Created Mnogochlen: " << *Newbie << endl;
+    cout << "Press any key" << endl;
+    _getch();
+
+    return Newbie;
+}
 
 ostream &operator<<(ostream &os, const Mnogochlen &Obj)
 {
     if (Obj.GetOrderOfMnogochlen() == -1)
     {
-        cout << "Polynominal has no coefs" << endl;
+        cout << "Mnogochlen has no coefs" << endl;
     }
     Node *Pointer = Obj.GetHead();
-    for (int i = 0; i < Obj.GetOrderOfMnogochlen() + 1; i++)
+    for (int i = 0; i < Obj.GetOrderOfMnogochlen() + 1 && Pointer; i++)
     {
         os << Pointer->Value << "*x^" << Pointer->MyOrder;
-        if (i != Obj.GetOrderOfMnogochlen())
+        if (Pointer->Next)
             os << " + ";
         Pointer = Pointer->Next;
     }
     return os;
 }
 
+double InputValue()
+{
+    cout << "Give a value: " << endl;
+    double X = 0;
+    cin >> X;
+    return X;
+}
+
+void GiveAnX(const Mnogochlen *Object)
+{
+    double Y = 0;
+    double X = InputValue();
+
+    for (int i = Object->GetOrderOfMnogochlen(); i >= 0; i--)
+    {
+        Y += (*Object)[i] * pow(X, i);
+    }
+
+    cout << "Value for polynom (x = " << X << "): " << Y << endl;
+}
+
+void Sum(const Mnogochlen *Object)
+{
+    system("clear");
+
+    cout << "Firstly input another polynom" << endl;
+    cout << "Any key to input another polynom" << endl;
+
+    _getch();
+
+    system("clear");
+
+    const Mnogochlen *Another = MenuInput();
+
+    system("clear");
+
+    cout << "Sum of two Mnogochlens:" << endl;
+    cout << "\n\nFirst: " << (*Object) << endl;
+    cout << "\nSecond: " << (*Another) << endl;
+    cout << "\nTheir sum: " << ((*Object) + (*Another)) << endl;
+
+    delete Another;
+}
+
+void Substract(const Mnogochlen *Object)
+{
+    system("clear");
+
+    cout << "Substract menu\n"
+         << endl;
+
+    cout << "Firstly input another polynom" << endl;
+    cout << "Any key to input another polynom" << endl;
+
+    _getch();
+
+    system("clear");
+
+    const Mnogochlen *Another = MenuInput();
+
+    system("clear");
+
+    cout << "Substract menu\n"
+         << endl;
+
+    cout << "Sum of two Mnogochlens:" << endl;
+    cout << "First: " << (*Object) << endl;
+    cout << "Second: " << (*Another) << endl;
+    cout << "Their substruction result: " << ((*Object) - (*Another)) << endl;
+
+    delete Another;
+}
+
+void MultiplyByArg(const Mnogochlen *Object)
+{
+    cout << "Multiply by arg menu\n"
+         << endl;
+    int Arg = InputValue();
+
+    system("clear");
+
+    cout << "Multiply by arg menu\n"
+         << endl;
+
+    cout << "(" << (*Object) << ")"
+         << " * " << Arg << " :" << endl;
+    cout << (*Object) * Arg << endl;
+}
+
+void GetCoefByIndex(const Mnogochlen *Object)
+{
+    system("clear");
+
+    cout << "Get coefficient by index menu\n"
+         << endl;
+    cout << (*Object) << endl;
+    cout << "Input index: ";
+    int Index = 0;
+    cin >> Index;
+    cout << "Value: " << (*Object)[Index] << endl;
+}
+
+void GetRoots(const Mnogochlen *Object)
+{
+    if (Object->GetOrderOfMnogochlen() != 3)
+    {
+        throw RangeError("Incorrect order");
+    }
+
+    system("clear");
+
+    cout << "Get roots menu\n"
+         << endl;
+    Object->GetRoots();
+}
+
+int MenuChoice()
+{
+    cout << "\n\t[1] - Give an X" << endl;
+    cout << "\n\t[2] - Sum" << endl;
+    cout << "\n\t[3] - Substract" << endl;
+    cout << "\n\t[4] - Multiply by arg" << endl;
+    cout << "\n\t[5] - Get coefficinent by index" << endl;
+    cout << "\n\t[6] - Get roots (3rd order)" << endl;
+    cout << "\n\t[BACKSPACE] - Set new polynoms" << endl;
+    cout << "\n\n\tEsc - Exit" << endl;
+    while (true)
+    {
+        int key = _getch();
+        if ((key == 49) || (key == 50) || (key == 51) || (key == 52) || (key == 53) || (key == 54) || (key == 127) || (key == 27))
+        {
+            return key;
+        }
+    }
+}
+
 int main()
 {
-    Mnogochlen first_obj(2);
-    for (int i = 2; i >= 0; i--)
+    while (true)
     {
-        first_obj.Set(i, (i + 1) * 3);
+
+        cout << "Hellow, world!" << endl;
+        system("clear");
+
+        Mnogochlen *Object = nullptr;
+
+        Object = MenuInput();
+
+        while (Object)
+        {
+            system("clear");
+
+            cout << "Your polymon: " << *Object << endl;
+            int Choice = MenuChoice();
+
+            switch (Choice)
+            {
+            case 49: // Give an X
+                GiveAnX(Object);
+                break;
+            case 50: // Sum
+
+                Sum(Object);
+                break;
+            case 51: // Substract
+                Substract(Object);
+                break;
+            case 52: // Multiply by arg
+                MultiplyByArg(Object);
+                break;
+            case 53: // Get doef by index
+                GetCoefByIndex(Object);
+                break;
+            case 54: // Get premitive fucntion
+                GetRoots(Object);
+                break;
+            case 127: // Set new polynoms
+                delete Object;
+                Object = nullptr;
+                break;
+            case 27: // Exit
+                system("clear");
+                cout << "Word is done" << endl;
+                return EXIT_SUCCESS;
+                break;
+            default:
+                break;
+            }
+
+            cout << "Press any key" << endl;
+            _getch();
+        }
     }
-
-    Mnogochlen second_obj(4);
-    for (int i = 4; i >= 0; i--)
-    {
-        second_obj.Set(i, ((i + 2) * 3));
-    }
-
-    cout << first_obj[0] << endl;
-
-    cout << first_obj << endl;
-
-    cout << second_obj << endl;
-
-    cout << (first_obj * 2) << endl;
-
-    cout << first_obj + second_obj << endl;
-
-    cout << first_obj - second_obj << endl;
-
-    cout << first_obj.CountValue(2.0) << endl;
-
-    Mnogochlen OrderThree(3);
-
-    for (int i = 3; i >= 0; i--)
-    {
-        OrderThree.Set(i, (i + 1) * 10);
-    }
-
-    double *X = new double[2]{0};
-    int NumOfRoots = OrderThree.GetRoots(X);
-
-    /*
-    Returns: 3 - 3 real roots;
-             1 - 1 real root + 2 complex;
-             2 - 1 real root + complex roots imaginary part is zero
-                 (i.e. 2 real roots).
-     */
-
-    switch (NumOfRoots)
-    {
-    case 1:
-        cout << "Root 1: " << X[0] << endl;
-        break;
-    case 2:
-        cout << "Root 1 : " << X[0] << endl;
-        cout << "Root 2 : " << X[1] << endl;
-        break;
-    case 3:
-        cout << "Root 1 : " << X[0] << endl;
-        cout << "Root 2 : " << X[1] << endl;
-        cout << "Root 3 : " << X[2] << endl;
-        break;
-    default:
-        cout << "Roots not found" << endl;
-        break;
-    }
-
-    return 0;
 }
