@@ -1,15 +1,14 @@
 #pragma once
-#include <conio.h>
-#include <math.h> /* for sqrt(), fabs(), pow(), cos(), acos(). */
-#define M_PI (3.141592653589793)
-#define M_2PI (2. * M_PI)
 #include <iostream>
+#include <math.h>
 #include "MnogochlenExceptions.hpp"
 using namespace std;
+#define M_PI (3.141592653589793)
+#define M_2PI (2. * M_PI)
 
 struct Node
 {
-    int MyOrder;
+    long long MyOrder;
     double Value;
     Node *Next;
 };
@@ -18,30 +17,32 @@ class Mnogochlen
 {
     Node *Head;
 
-    int OrderOfMnogochlen;
+    long long OrderOfMnogochlen;
 
-    void Normalize();
+    Mnogochlen Normalize() const;
 
 public:
     Node *GetHead() const;
 
-    int GetOrderOfMnogochlen() const;
+    long long GetOrderOfMnogochlen() const;
 
-    Mnogochlen(int Order);
+    Mnogochlen(long long Order);
 
-    void Set(int Order, double Coef);
+    ~Mnogochlen();
 
-    double operator[](int Order);
+    void Set(long long Order, double Coef);
 
-    Mnogochlen operator+(const Mnogochlen &other);
+    double operator[](long long Order) const;
 
-    Mnogochlen operator-(const Mnogochlen &other);
+    Mnogochlen operator+(const Mnogochlen &Other) const;
 
-    Mnogochlen operator*(double Val);
+    Mnogochlen operator-(const Mnogochlen &Other) const;
 
-    double CountValue(double x);
+    Mnogochlen operator*(double Val) const;
 
-    int GetRoots(double *x);
+    void GetRoots() const;
+
+    double CountValue(double x) const;
 
     friend ostream &operator<<(ostream &os, const Mnogochlen &Obj);
 };
