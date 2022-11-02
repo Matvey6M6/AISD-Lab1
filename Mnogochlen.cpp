@@ -5,35 +5,12 @@ Node *Mnogochlen::GetHead() const
     return Head;
 }
 
-double Mnogochlen::CountValue(double x)
-{
-    Node *Pointer = GetHead();
-    double Ans = 0;
-    for (int i = 0; i < GetOrderOfMnogochlen() + 1; i++)
-    {
-        Ans += Pointer->Value * pow(x, Pointer->MyOrder);
-        Pointer = Pointer->Next;
-    }
-    return Ans;
-}
-
-void Mnogochlen::Normalize()
-{
-    Node *Pointer = GetHead();
-    double Devider = Pointer->Value;
-    for (int i = 0; i < GetOrderOfMnogochlen() + 1; i++)
-    {
-        Pointer->Value = Pointer->Value / Devider;
-        Pointer = Pointer->Next;
-    }
-}
-
-int Mnogochlen::GetOrderOfMnogochlen() const
+long long Mnogochlen::GetOrderOfMnogochlen() const
 {
     return OrderOfMnogochlen;
 }
 
-Mnogochlen::Mnogochlen(int Order)
+Mnogochlen::Mnogochlen(long long Order)
 {
     if (Order >= 0)
     {
@@ -42,15 +19,26 @@ Mnogochlen::Mnogochlen(int Order)
     }
     else
     {
+        delete this;
         throw RangeError("Incorrect \"Order\" for polynomianl");
     }
 }
 
-void Mnogochlen::Set(int Order, double Coef)
+Mnogochlen::~Mnogochlen()
+{
+    while (Head != NULL)
+    {
+        Node *tmp = Head;
+        Head = Head->Next;
+        delete tmp;
+    }
+}
+
+void Mnogochlen::Set(long long Order, double Coef)
 {
     if (Coef == 0)
     {
-        cout << "Only non-zero coefs are available" << endl;
+        cout << "\n!!!Only non-zero coefs will be saved!!!" << endl;
         if (Order == GetOrderOfMnogochlen())
         {
             OrderOfMnogochlen -= 1;
@@ -74,7 +62,7 @@ void Mnogochlen::Set(int Order, double Coef)
 
     Node *PointerA = GetHead();
     Node *PointerB = PointerA;
-    for (int i = 0; i < GetOrderOfMnogochlen() + 1; i++)
+    for (long long i = 0; i < GetOrderOfMnogochlen() + 1 && PointerA; i++)
     {
         if (PointerA->Next == nullptr && Order < PointerA->MyOrder) //последний эдемент
         {
@@ -106,7 +94,147 @@ void Mnogochlen::Set(int Order, double Coef)
     }
 }
 
-int Mnogochlen::GetRoots(double *x)
+double Mnogochlen::operator[](long long Order) const
+{
+    Node *Pointer = GetHead();
+
+    while (Pointer)
+    {
+        if (Pointer->MyOrder == Order)
+            return Pointer->Value;
+        Pointer = Pointer->Next;
+    }
+    return 0;
+}
+
+Mnogochlen Mnogochlen::operator+(const Mnogochlen &Other) const
+{
+    long long Maximum = 0;
+
+    this->GetOrderOfMnogochlen() < Other.GetOrderOfMnogochlen() ? Maximum = Other.GetOrderOfMnogochlen() : Maximum = this->GetOrderOfMnogochlen();
+
+    Mnogochlen Result(Maximum);
+
+    int CurrentOrder = Maximum;
+
+    while (CurrentOrder > -1)
+    {
+        Result.Set(CurrentOrder, ((*this)[CurrentOrder]) + (Other[CurrentOrder]));
+        CurrentOrder--;
+    }
+
+    return Result;
+}
+
+Mnogochlen Mnogochlen::operator-(const Mnogochlen &Other) const
+{
+    int Maximum = 0;
+
+    this->GetOrderOfMnogochlen() < Other.GetOrderOfMnogochlen() ? Maximum = Other.GetOrderOfMnogochlen() : Maximum = this->GetOrderOfMnogochlen();
+
+    Mnogochlen Result(Maximum);
+
+    long long CurrentOrder = Maximum;
+
+    while (CurrentOrder > -1)
+    {
+        Result.Set(CurrentOrder, ((*this)[CurrentOrder]) - (Other[CurrentOrder]));
+        CurrentOrder--;
+    }
+
+    return Result;
+}
+
+Mnogochlen Mnogochlen::operator*(double Val) const
+{
+    Node *Pointer = GetHead();
+    Mnogochlen Result(Pointer->MyOrder);
+
+    for (long long i = 0; i <= GetOrderOfMnogochlen(); i++)
+    {
+        Result.Set(Pointer->MyOrder, Pointer->Value * Val);
+        Pointer = Pointer->Next;
+    }
+    return Result;
+}
+
+double Mnogochlen::CountValue(double x) const
+{
+    Node *Pointer = GetHead();
+    double Ans = 0;
+    for (long long i = 0; i < GetOrderOfMnogochlen() + 1 && Pointer; i++)
+    {
+        Ans += Pointer->Value * pow(x, Pointer->MyOrder);
+        Pointer = Pointer->Next;
+    }
+    return Ans;
+}
+/*
+void Mnogochlen::GetRoots() const
+{
+    Mnogochlen *Newbie = &Normalize();
+    double a = (*Newbie)[3];
+    double b = (*Newbie)[2];
+    double c = (*Newbie)[1];
+    double d = (*Newbie)[0];
+
+    long double p = ((3. * a * c - b * b) / (3. * a * a));
+    long double q = ((2. * b * b - 9. * a * b * c + 27. * a * a * d));
+    long double s = (((q * q) / 4.) + (p * p * p) / 27.);
+
+    long double x1, x2, x3, x2i, x3i;
+
+    long double f;
+
+    if (q < 0)
+    {
+        f = (atan(pow(-s, 0.5) / (-q / 2)));
+    }
+    else if (q > 0)
+    {
+        f = (atan(pow(-s, 0.5) / (-q / 2)) + M_PI);
+    }
+    else
+    {
+        f = (M_PI / 2);
+    }
+
+    if (s < 0)
+    {
+        x1 = (2. * pow((-p / 3.), 0.5) * cos(f / 3.) - b / 3. * a);
+        x2 = (2. * pow((-p / 3.), 0.5) * cos(f / 3. + (2. * M_PI) / 3.) - b / 3. * a);
+        x3 = (2. * pow((-p / 3.), 0.5) * cos(f / 3. + (2. * M_PI) / 3.) - b / 3. * a);
+    }
+    else if (s > 0)
+    {
+        x1 = (pow(-q / 2. + pow(s, 0.5), 1. / 3.) + pow(-q / 2. - (pow(s, 0.5)), 1. / 3.) - b / (3. * a));
+        x2 = (-0.5 * (pow(-q / 2. + pow(s, 0.5), 1. / 3.) + pow(-q / 2. - (pow(s, 0.5)), 1. / 3.) - b / (3. * a)));
+        x2i = ((pow(3., 0.5) / 2.) * (pow(-q / 2. + (pow(s, 0.5)), 1. / 3.) - pow(-q / 2. - (pow(s, 0.5)), 1. / 3.)));
+        x3 = (-0.5 * (pow(-q / 2 + pow(s, 0.5), 1 / 3) + pow(-q / 2 - (pow(s, 0.5)), 1 / 3) - b / (3 * a)));
+        x3i = ((pow(3., 0.5) / 2.) * (pow(-q / 2. + (pow(s, 0.5)), 1. / 3.) - pow(-q / 2. - (pow(s, 0.5)), 1. / 3.)));
+    }
+    else
+    {
+        x1 = (2. * pow(-q / 2., 1. / 3.) - b / (3. * a));
+        x2 = (-1. * pow(-q / 2., 1. / 3.) - b / (3. * a));
+        x3 = (-1. * pow(-q / 2., 1. / 3.) - b / (3. * a));
+    }
+
+    cout << "x1= " << x1 << endl;
+
+    if (s > 0)
+    {
+        cout << "x2= " << x2 << "+" << x2i << "i" << endl;
+        cout << "x3= " << x3 << "-" << x3i << "i" << endl;
+    }
+    else
+    {
+        cout << "x2= " << x2 << endl;
+        cout << "x3= " << x3 << endl;
+    }
+}*/
+
+/*int Mnogochlen::GetRoots(double *x) const
 {
     if (GetOrderOfMnogochlen() != 3)
     {
@@ -143,8 +271,8 @@ int Mnogochlen::GetRoots(double *x)
         a /= 3.;
         q = -2. * sqrt(q);
         x[0] = q * cos(t / 3.) - a;
-        x[1] = q * cos((t + M_2PI) / 3.) - a;
-        x[2] = q * cos((t - M_2PI) / 3.) - a;
+        x[1] = q * cos((t + M_2M_M_M_PI) / 3.) - a;
+        x[2] = q * cos((t - M_2M_M_M_PI) / 3.) - a;
         return (3);
     }
     else
@@ -167,95 +295,4 @@ int Mnogochlen::GetRoots(double *x)
             return (2);
         return (1);
     }
-}
-
-double Mnogochlen::operator[](int Order)
-{
-    if (Order < 0 || Order > OrderOfMnogochlen)
-    {
-        throw RangeError("Incorrect \"Order\", value can't be found\n");
-    }
-
-    Node *Pointer = GetHead();
-
-    for (int i = 0; i <= GetOrderOfMnogochlen(); i++)
-    {
-        if (Pointer->MyOrder == Order)
-            return Pointer->Value;
-        Pointer = Pointer->Next;
-    }
-    throw RangeError("Order has no coef\n");
-}
-
-Mnogochlen Mnogochlen::operator+(const Mnogochlen &other)
-{
-    int Length = 0;
-    int Maximum = 0;
-    this->GetOrderOfMnogochlen() > other.GetOrderOfMnogochlen() ? Length = other.GetOrderOfMnogochlen() : Length = this->GetOrderOfMnogochlen();
-
-    this->GetOrderOfMnogochlen() < other.GetOrderOfMnogochlen() ? Maximum = other.GetOrderOfMnogochlen() : Maximum = this->GetOrderOfMnogochlen();
-
-    Mnogochlen Result(Length);
-
-    Node *PointerA = this->GetHead();
-    Node *PointerB = other.GetHead();
-
-    for (int i = 0; i < Length + 1; i++)
-    {
-        for (int j = 0; j <= Maximum + 1; j++)
-        {
-            if (PointerA->MyOrder == PointerB->MyOrder)
-            {
-                Result.Set(PointerA->MyOrder, (PointerA->Value + PointerB->Value));
-                break;
-            }
-            PointerB = PointerB->Next;
-        }
-        PointerB = other.GetHead();
-        PointerA = PointerA->Next;
-    }
-    return Result;
-}
-
-Mnogochlen Mnogochlen::operator-(const Mnogochlen &other)
-{
-    int Length = 0;
-    int Maximum = 0;
-    this->GetOrderOfMnogochlen() > other.GetOrderOfMnogochlen() ? Length = other.GetOrderOfMnogochlen() : Length = this->GetOrderOfMnogochlen();
-
-    this->GetOrderOfMnogochlen() < other.GetOrderOfMnogochlen() ? Maximum = other.GetOrderOfMnogochlen() : Maximum = this->GetOrderOfMnogochlen();
-
-    Mnogochlen Result(Length);
-
-    Node *PointerA = this->GetHead();
-    Node *PointerB = other.GetHead();
-
-    for (int i = 0; i < Length + 1; i++)
-    {
-        for (int j = 0; j <= Maximum + 1; j++)
-        {
-            if (PointerA->MyOrder == PointerB->MyOrder)
-            {
-                Result.Set(PointerA->MyOrder, (PointerA->Value - PointerB->Value));
-                break;
-            }
-            PointerB = PointerB->Next;
-        }
-        PointerB = other.GetHead();
-        PointerA = PointerA->Next;
-    }
-    return Result;
-}
-
-Mnogochlen Mnogochlen::operator*(double Val)
-{
-    Node *Pointer = GetHead();
-    Mnogochlen Result(Pointer->MyOrder);
-
-    for (int i = 0; i <= GetOrderOfMnogochlen(); i++)
-    {
-        Result.Set(Pointer->MyOrder, Pointer->Value * Val);
-        Pointer = Pointer->Next;
-    }
-    return Result;
-}
+}*/
