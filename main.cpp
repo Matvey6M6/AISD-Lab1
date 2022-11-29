@@ -3,7 +3,7 @@
 #include "Mnogochlen.hpp"
 using namespace std;
 
-/*char getch(void)
+/*char _getch(void)
 {
     char buf = 0;
     struct termios old = {0};
@@ -24,6 +24,20 @@ using namespace std;
         perror("tcsetattr ~ICANON");
     return buf;
 }*/
+
+double check()
+{
+	double number = 0;
+	
+    while (!(cin >> number) || (cin.peek() != '\n'))
+    {
+        cin.clear();
+        while (cin.get() != '\n');
+        cout << "Incorrect value\n";
+    }
+
+    return number;
+}
 
 Mnogochlen *MenuInput()
 {
@@ -47,8 +61,7 @@ Mnogochlen *MenuInput()
     for (long long i = OrderOfMnogochlen; i >= 0; i--)
     {
         cout << "Coef by " << i << ":\n";
-        double Coefficient = 0;
-        cin >> Coefficient;
+        double Coefficient =  check();
         Newbie->Set(i, Coefficient);
         cout << endl;
     }
@@ -80,8 +93,7 @@ ostream &operator<<(ostream &os, const Mnogochlen &Obj)
 double InputValue()
 {
     cout << "Give a value: " << endl;
-    double X = 0;
-    cin >> X;
+    double X = check();
     return X;
 }
 
@@ -166,17 +178,56 @@ void MultiplyByArg(const Mnogochlen *Object)
     cout << (*Object) * Arg << endl;
 }
 
-void GetCoefByIndex(const Mnogochlen *Object)
+void ChangeCoefByIndex(Mnogochlen *Object)
 {
     system("clear");
 
-    cout << "Get coefficient by index menu\n"
+    cout << "Change coefficient by index menu\n"
          << endl;
     cout << (*Object) << endl;
     cout << "Input index: ";
-    int Index = 0;
-    cin >> Index;
+    int Index = check();
+    cout<<"Input new value: ";
+    double value = check();
+    (*Object).Set(Index, value);
     cout << "Value: " << (*Object)[Index] << endl;
+}
+
+void CompareTwoPolynoms(const Mnogochlen *Object)
+{
+    system("clear");
+
+    cout << "Compare two polynoms menu\n"
+         << endl;
+
+    cout << "Firstly input another polynom" << endl;
+    cout << "Any key to input another polynom" << endl;
+
+    _getch();
+
+    system("clear");
+
+    const Mnogochlen *Another = MenuInput();
+
+    system("clear");
+
+    cout << "Compare two polynoms menu\n"
+         << endl;
+
+    cout<<"First "<<(*Object)<<endl;
+    cout<<"Second "<<(*Another)<<endl;    
+
+    if((*Object) == (*Another))
+    {
+        cout << "The first is equal to second." << endl;
+    }
+    else
+    {
+        cout << "The first is NOT equal to second." << endl;
+    }
+
+    cout<<"Press any button to continue"<<endl;
+    _getch();
 }
 
 void GetRoots(const Mnogochlen *Object)
@@ -199,14 +250,15 @@ int MenuChoice()
     cout << "\n\t[2] - Sum" << endl;
     cout << "\n\t[3] - Substract" << endl;
     cout << "\n\t[4] - Multiply by arg" << endl;
-    cout << "\n\t[5] - Get coefficinent by index" << endl;
+    cout << "\n\t[5] - Change coefficinent by index" << endl;
     cout << "\n\t[6] - Get roots (3rd order)" << endl;
+    cout << "\n\t[7] - Compare two polynoms"<<endl;
     cout << "\n\t[BACKSPACE] - Set new polynoms" << endl;
     cout << "\n\n\tEsc - Exit" << endl;
     while (true)
     {
         int key = _getch();
-        if ((key == 49) || (key == 50) || (key == 51) || (key == 52) || (key == 53) || (key == 54) || (key == 127) || (key == 27))
+        if ((key == 49) || (key == 50) || (key == 51) || (key == 52) || (key == 53) || (key == 54) || (key == 55) || (key == 127) || (key == 27))
         {
             return key;
         }
@@ -215,6 +267,7 @@ int MenuChoice()
 
 int main()
 {
+
     while (true)
     {
 
@@ -248,10 +301,13 @@ int main()
                 MultiplyByArg(Object);
                 break;
             case 53: // Get doef by index
-                GetCoefByIndex(Object);
+                ChangeCoefByIndex(Object);
                 break;
             case 54: // Get premitive fucntion
                 GetRoots(Object);
+                break;
+            case 55: // Compare two polynoms
+                CompareTwoPolynoms(Object);
                 break;
             case 127: // Set new polynoms
                 delete Object;
