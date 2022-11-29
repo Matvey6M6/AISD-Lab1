@@ -38,9 +38,19 @@ Mnogochlen::Mnogochlen(long long Order)
     }
 }
 
+Mnogochlen::Mnogochlen(const Mnogochlen& src)
+    {
+        this->OrderOfMnogochlen = src.GetOrderOfMnogochlen();
+        
+        for(long long i = OrderOfMnogochlen; i >=0; i--)
+        {
+            Set(i,src[i]);
+        }
+    }
+
 Mnogochlen::~Mnogochlen()
 {
-    while (Head != NULL)
+    while (Head->Next != nullptr)
     {
         Node *tmp = Head;
         Head = Head->Next;
@@ -164,12 +174,70 @@ Mnogochlen Mnogochlen::operator*(double Val) const
     Node *Pointer = GetHead();
     Mnogochlen Result(Pointer->MyOrder);
 
-    for (long long i = 0; i <= GetOrderOfMnogochlen(); i++)
+    while(Pointer != NULL)
     {
         Result.Set(Pointer->MyOrder, Pointer->Value * Val);
         Pointer = Pointer->Next;
     }
     return Result;
+}
+
+bool Mnogochlen::operator==(const Mnogochlen &Other) const
+{
+    Node* P1 = this->GetHead();
+    Node* P2 = Other.GetHead();
+
+    if(P1 != nullptr && P2!= nullptr)
+    {
+        if(P1->MyOrder == P2->MyOrder)
+        {
+            while(P1 != nullptr && P2!= nullptr)
+            {
+                if(P1->Value == P2->Value)
+                {
+                    if(P1->MyOrder == P2->MyOrder && P1->MyOrder == 0) return true;
+                }
+                else return false;
+                P1 = P1->Next;
+                P2 = P2->Next;
+            }
+        }
+        else return false;
+    }
+    if(this->GetHead() || Other.GetHead()) return false;
+    return true;
+}
+
+bool Mnogochlen::operator!=(const Mnogochlen &Other) const
+{
+    Node* P1 = this->GetHead();
+    Node* P2 = Other.GetHead();
+
+    if(P1 != nullptr && P2!= nullptr)
+    {
+        if(P1->MyOrder != P2->MyOrder)
+        {
+            return true;
+        }
+        else 
+        {
+            while(P1 != nullptr && P2!= nullptr)
+            {
+                if(P1->Value != P2->Value)
+                {
+                    return true;
+                }
+                else 
+                {
+                    if(P1->MyOrder == P2->MyOrder && P1->MyOrder == 0) return false;
+                }
+                P1 = P1->Next;
+                P2 = P2->Next;
+            }
+        }
+    }
+    if(this->GetHead() || Other.GetHead()) return true;
+    return false;
 }
 
 void Mnogochlen::GetRoots() const
