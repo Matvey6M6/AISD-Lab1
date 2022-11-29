@@ -28,6 +28,8 @@ public:
 
     Mnogochlen(long long Order);
 
+    Mnogochlen(const Mnogochlen& src);
+
     ~Mnogochlen();
 
     void Set(long long Order, double Coef);
@@ -39,6 +41,10 @@ public:
     Mnogochlen operator-(const Mnogochlen &Other) const;
 
     Mnogochlen operator*(double Val) const;
+
+    bool operator==(const Mnogochlen &Other) const;
+
+    bool operator!=(const Mnogochlen &Other) const;
 
     void GetRoots() const;
 
