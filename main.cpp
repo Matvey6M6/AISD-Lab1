@@ -1,9 +1,11 @@
 #include <iostream>
-#include <conio.h>
+//#include <conio.h>
+#include <unistd.h>
+#include <termios.h>
 #include "Mnogochlen.hpp"
 using namespace std;
 
-/*char _getch(void)
+char _getch(void)
 {
     char buf = 0;
     struct termios old = {0};
@@ -23,7 +25,7 @@ using namespace std;
     if (tcsetattr(0, TCSADRAIN, &old) < 0)
         perror("tcsetattr ~ICANON");
     return buf;
-}*/
+}
 
 double check()
 {
@@ -48,10 +50,12 @@ Mnogochlen *MenuInput()
     long long OrderOfMnogochlen = 0;
     cin >> OrderOfMnogochlen;
 
+    cout << "Epsilon: " << endl;
+    int Epsilon = int(check());
     Mnogochlen *Newbie = NULL;
     try
     {
-        Newbie = new Mnogochlen(OrderOfMnogochlen);
+        Newbie = new Mnogochlen(OrderOfMnogochlen, Epsilon);
     }
     catch (exception e)
     {
@@ -166,7 +170,7 @@ void MultiplyByArg(const Mnogochlen *Object)
 {
     cout << "Multiply by arg menu\n"
          << endl;
-    int Arg = InputValue();
+    double Arg = InputValue();
 
     system("clear");
 
@@ -241,6 +245,9 @@ void GetRoots(const Mnogochlen *Object)
 
     cout << "Get roots menu\n"
          << endl;
+
+    cout<<(*Object)<<endl;
+
     Object->GetRoots();
 }
 
