@@ -1,16 +1,15 @@
 #include "Mnogochlen.hpp"
 
+int Mnogochlen::GetEpsilon() const {return this->Epsilon;}
+
 Mnogochlen Mnogochlen::Normalize() const
 {
-    Mnogochlen *Newbie = new Mnogochlen(GetOrderOfMnogochlen());
-
+    Mnogochlen *Newbie = new Mnogochlen(GetOrderOfMnogochlen(), GetEpsilon());
     double Delitel = (*this)[GetOrderOfMnogochlen()];
-
     for (int i = OrderOfMnogochlen; i >= 0; i--)
     {
         Newbie->Set(i, ((*this)[i] / Delitel));
     }
-
     return *Newbie;
 }
 
@@ -24,12 +23,13 @@ long long Mnogochlen::GetOrderOfMnogochlen() const
     return OrderOfMnogochlen;
 }
 
-Mnogochlen::Mnogochlen(long long Order)
+Mnogochlen::Mnogochlen(long long Order, int Epsilon)
 {
-    if (Order >= 0)
+    if (Order >= 0 || Epsilon > 0)
     {
         OrderOfMnogochlen = Order;
         Head = nullptr;
+        this->Epsilon = Epsilon;
     }
     else
     {
@@ -38,15 +38,20 @@ Mnogochlen::Mnogochlen(long long Order)
     }
 }
 
-Mnogochlen::Mnogochlen(const Mnogochlen& src)
+Mnogochlen::Mnogochlen(const Mnogochlen& Other)
+{
+    OrderOfMnogochlen = Other.GetOrderOfMnogochlen();
+    Head = nullptr;
+    this->Epsilon = Other.GetEpsilon();
+
+    Node* P = Other.GetHead();
+
+    while(P != nullptr)
     {
-        this->OrderOfMnogochlen = src.GetOrderOfMnogochlen();
-        
-        for(long long i = OrderOfMnogochlen; i >=0; i--)
-        {
-            Set(i,src[i]);
-        }
+        Set(P->MyOrder,P->Value);
+        P=P->Next;
     }
+}
 
 Mnogochlen::~Mnogochlen()
 {
@@ -137,7 +142,7 @@ Mnogochlen Mnogochlen::operator+(const Mnogochlen &Other) const
 
     this->GetOrderOfMnogochlen() < Other.GetOrderOfMnogochlen() ? Maximum = Other.GetOrderOfMnogochlen() : Maximum = this->GetOrderOfMnogochlen();
 
-    Mnogochlen Result(Maximum);
+    Mnogochlen Result(Maximum, this->GetEpsilon());
 
     long long CurrentOrder = Maximum;
 
@@ -148,6 +153,7 @@ Mnogochlen Mnogochlen::operator+(const Mnogochlen &Other) const
     }
 
     return Result;
+
 }
 
 Mnogochlen Mnogochlen::operator-(const Mnogochlen &Other) const
@@ -156,7 +162,7 @@ Mnogochlen Mnogochlen::operator-(const Mnogochlen &Other) const
 
     this->GetOrderOfMnogochlen() < Other.GetOrderOfMnogochlen() ? Maximum = Other.GetOrderOfMnogochlen() : Maximum = this->GetOrderOfMnogochlen();
 
-    Mnogochlen Result(Maximum);
+    Mnogochlen Result(Maximum, this->GetEpsilon());
 
     long long CurrentOrder = Maximum;
 
@@ -172,7 +178,7 @@ Mnogochlen Mnogochlen::operator-(const Mnogochlen &Other) const
 Mnogochlen Mnogochlen::operator*(double Val) const
 {
     Node *Pointer = GetHead();
-    Mnogochlen Result(Pointer->MyOrder);
+    Mnogochlen Result(Pointer->MyOrder, this->GetEpsilon());
 
     while(Pointer != NULL)
     {
@@ -182,8 +188,14 @@ Mnogochlen Mnogochlen::operator*(double Val) const
     return Result;
 }
 
+Mnogochlen operator*(const int val, const Mnogochlen& M) // обеспечивает коммутативность
+{
+    return M * val;
+}
+
 bool Mnogochlen::operator==(const Mnogochlen &Other) const
 {
+    cout<<"Epsilon = "<<Epsilon<<endl;
     Node* P1 = this->GetHead();
     Node* P2 = Other.GetHead();
 
@@ -193,7 +205,7 @@ bool Mnogochlen::operator==(const Mnogochlen &Other) const
         {
             while(P1 != nullptr && P2!= nullptr)
             {
-                if(P1->Value == P2->Value)
+                if((abs(P1->Value - P2->Value) < Epsilon))
                 {
                     if(P1->MyOrder == P2->MyOrder && P1->MyOrder == 0) return true;
                 }
@@ -210,6 +222,7 @@ bool Mnogochlen::operator==(const Mnogochlen &Other) const
 
 bool Mnogochlen::operator!=(const Mnogochlen &Other) const
 {
+    cout<<"Epsilon = "<<Epsilon<<endl;
     Node* P1 = this->GetHead();
     Node* P2 = Other.GetHead();
 
@@ -223,13 +236,13 @@ bool Mnogochlen::operator!=(const Mnogochlen &Other) const
         {
             while(P1 != nullptr && P2!= nullptr)
             {
-                if(P1->Value != P2->Value)
+                if((abs(P1->Value - P2->Value) > Epsilon))
                 {
                     return true;
                 }
                 else 
                 {
-                    if(P1->MyOrder == P2->MyOrder && P1->MyOrder == 0) return false;
+                    if(P1->MyOrder - P2->MyOrder && P1->MyOrder == 0) return false;
                 }
                 P1 = P1->Next;
                 P2 = P2->Next;
@@ -248,17 +261,13 @@ void Mnogochlen::GetRoots() const
     }
     Node *Pointer = GetHead();
     Mnogochlen Normalized = Normalize();
-
     // cout << Normalized << endl;
-
     double a = Normalized[2];
     double b = Normalized[1];
     double c = Normalized[0];
-
     double x1;
     double x2;
     double x3;
-
     double q, r, r2, q3;
     q = (a * a - 3. * b) / 9.;
     r = (a * (2. * a * a - 9. * b) + 27. * c) / 54.;
@@ -300,6 +309,22 @@ void Mnogochlen::GetRoots() const
         cout << "Root 1 = " << x1 << endl;
     }
 }
+
+/*Mnogochlen::Mnogochlen(const Mnogochlen& src)
+{
+    this->OrderOfMnogochlen = src.GetOrderOfMnogochlen();
+    
+    Node* Pointer = src.GetHead();
+
+    int i = OrderOfMnogochlen;
+
+    while(Pointer)
+    {
+        this->Set(i, Pointer->Value);
+        Pointer = Pointer->Next;
+        i--;
+    }
+}*/
 
 double Mnogochlen::CountValue(double x) const
 {
