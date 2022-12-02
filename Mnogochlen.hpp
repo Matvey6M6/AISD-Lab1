@@ -19,16 +19,21 @@ class Mnogochlen
 
     long long OrderOfMnogochlen;
 
+    int Epsilon; 
+
     Mnogochlen Normalize() const;
 
 public:
+
+    int GetEpsilon()const;
+
     Node *GetHead() const;
 
     long long GetOrderOfMnogochlen() const;
 
-    Mnogochlen(long long Order);
+    Mnogochlen(long long Order, int Epsilon);
 
-    Mnogochlen(const Mnogochlen& src);
+    Mnogochlen(const Mnogochlen& Other);
 
     ~Mnogochlen();
 
